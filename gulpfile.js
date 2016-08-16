@@ -1,7 +1,5 @@
-/**
- * [gulp description]
- * @type {[type]}
- */
+'use strict';
+
 var gulp = require('gulp');
 var os = require('os');
 var gutil = require('gulp-util');
@@ -30,7 +28,7 @@ var host = {
 
 //mac chrome: "Google chrome"
 var browser = os.platform() === 'linux' ? 'Google chrome' : (os.platform() === 'darwin' ? 'Google chrome' : (os.platform() === 'win32' ? 'chrome' : 'firefox'));
-var pkg = require('./package.json');
+// var pkg = require('./package.json');
 
 //将图片拷贝到目标目录
 gulp.task('copy:images', function(done) {
@@ -95,21 +93,22 @@ gulp.task('sprite', ['copy:images', 'lessmin'], function(done) {
         .on('end', done);
 });
 
+// 构建前删除 DIST 目录
 gulp.task('clean', function() {
     return del('./dist/').then(function() {
-        console.log('-----------------------');
-        console.log('      删除成功！！     ');
-        console.log('-----------------------');
+        console.log('删除成功！！');
     });
 });
 
+// 监控
 gulp.task('watch', function(done) {
     gulp.watch('src/**/*', ['lessmin', 'build-js', 'fileinclude'])
         .on('end', done);
 });
 
+// 启动服务
 gulp.task('connect', function() {
-    console.log('connect------------');
+    console.log('connect start ------------');
     connect.server({
         root: host.path,
         port: host.port,
@@ -117,6 +116,7 @@ gulp.task('connect', function() {
     });
 });
 
+// 打开浏览器
 gulp.task('open', function(done) {
     gulp.src('')
         .pipe(gulpOpen({
@@ -140,8 +140,11 @@ gulp.task("build-js", ['fileinclude'], function(callback) {
     });
 });
 
-//发布
+
+
+
+// 发布
 gulp.task('default', sequence('clean', ['fileinclude', 'md5:css', 'md5:js'], 'connect', 'open'));
 
-//开发
+// 开发
 gulp.task('dev', sequence('clean', ['copy:images', 'fileinclude', 'lessmin', 'build-js'], 'connect', 'watch', 'open'));
