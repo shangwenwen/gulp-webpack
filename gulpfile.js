@@ -1,26 +1,25 @@
 /**
- Gulpfile for gulp-webpack-demo
- created by fwon
-*/
-
-var gulp = require('gulp')
-var os = require('os'),
-    gutil = require('gulp-util'),
-    less = require('gulp-less'),
-    concat = require('gulp-concat'),
-    gulpOpen = require('gulp-open'),
-    uglify = require('gulp-uglify'),
-    cssmin = require('gulp-cssmin'),
-    md5 = require('gulp-md5-plus'),
-    fileinclude = require('gulp-file-include'),
-    clean = require('gulp-clean'),
-    spriter = require('gulp-css-spriter'),
-    base64 = require('gulp-css-base64'),
-    webpack = require('webpack'),
-    webpackConfig = require('./webpack.config.js'),
-    sequence = require('gulp-sequence'),
-    del = require('del'),
-    connect = require('gulp-connect');
+ * [gulp description]
+ * @type {[type]}
+ */
+var gulp = require('gulp');
+var os = require('os');
+var gutil = require('gulp-util');
+var less = require('gulp-less');
+var concat = require('gulp-concat');
+var gulpOpen = require('gulp-open');
+var uglify = require('gulp-uglify');
+var cssmin = require('gulp-cssmin');
+var md5 = require('gulp-md5-plus');
+var fileinclude = require('gulp-file-include');
+var clean = require('gulp-clean');
+var spriter = require('gulp-css-spriter');
+var base64 = require('gulp-css-base64');
+var webpack = require('webpack');
+var webpackConfig = require('./webpack.config.js');
+var sequence = require('gulp-sequence');
+var del = require('del');
+var connect = require('gulp-connect');
 
 
 var host = {
@@ -29,10 +28,8 @@ var host = {
     html: 'index.html'
 };
 
-//mac chrome: "Google chrome", 
-var browser = os.platform() === 'linux' ? 'Google chrome' : (
-    os.platform() === 'darwin' ? 'Google chrome' : (
-        os.platform() === 'win32' ? 'chrome' : 'firefox'));
+//mac chrome: "Google chrome"
+var browser = os.platform() === 'linux' ? 'Google chrome' : (os.platform() === 'darwin' ? 'Google chrome' : (os.platform() === 'win32' ? 'chrome' : 'firefox'));
 var pkg = require('./package.json');
 
 //将图片拷贝到目标目录
@@ -130,7 +127,6 @@ gulp.task('open', function(done) {
 });
 
 var myDevConfig = Object.create(webpackConfig);
-
 var devCompiler = webpack(myDevConfig);
 
 //引用webpack对js进行操作
@@ -145,11 +141,7 @@ gulp.task("build-js", ['fileinclude'], function(callback) {
 });
 
 //发布
-// gulp.task('default', ['connect', 'fileinclude', 'md5:css', 'md5:js', 'open']);
-
 gulp.task('default', sequence('clean', ['fileinclude', 'md5:css', 'md5:js'], 'connect', 'open'));
 
 //开发
-// gulp.task('dev', ['connect', 'copy:images', 'fileinclude', 'lessmin', 'build-js', 'watch', 'open']);
-
 gulp.task('dev', sequence('clean', ['copy:images', 'fileinclude', 'lessmin', 'build-js'], 'connect', 'watch', 'open'));
