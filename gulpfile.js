@@ -28,7 +28,6 @@ var host = {
 
 //mac chrome: "Google chrome"
 var browser = os.platform() === 'linux' ? 'Google chrome' : (os.platform() === 'darwin' ? 'Google chrome' : (os.platform() === 'win32' ? 'chrome' : 'firefox'));
-// var pkg = require('./package.json');
 
 //将图片拷贝到目标目录
 gulp.task('copy:images', function(done) {
@@ -41,8 +40,6 @@ gulp.task('copy:images', function(done) {
 gulp.task('lessmin', function(done) {
     gulp.src(['src/css/main.less', 'src/css/*.css'])
         .pipe(less())
-        //这里可以加css sprite 让每一个css合并为一个雪碧图
-        //.pipe(spriter({}))
         .pipe(concat('style.min.css'))
         .pipe(gulp.dest('dist/css/'))
         .on('end', done);
@@ -68,7 +65,7 @@ gulp.task('md5:css', ['sprite'], function(done) {
 gulp.task('fileinclude', function(done) {
     gulp.src(['src/app/*.html'])
         .pipe(fileinclude({
-            prefix: '@@',
+            prefix: '@',
             basepath: '@file'
         }))
         .pipe(gulp.dest('dist/app'))
