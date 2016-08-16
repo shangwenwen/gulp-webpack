@@ -5,6 +5,8 @@ $.fn.slider = require('ui/slider.js');
 
 $(window).load(function() {
   
+  console.log('shangssss');
+
   var slider = $('.banner').slider({
     dots: true,
     fluid: true,
