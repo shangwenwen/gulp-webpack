@@ -20,13 +20,6 @@ var del = require('del');
 var browserSync = require('browser-sync').create();
 
 
-var host = {
-    path: 'dist/',
-    port: 3000,
-    html: 'index.html'
-};
-
-
 //将图片拷贝到目标目录
 gulp.task('copy:images', function() {
     return gulp.src(['src/images/**/*'])
@@ -44,8 +37,8 @@ gulp.task('lessmin', function() {
         .pipe(browserSync.stream());
 });
 
-//将js加上10位md5,并修改html中的引用路径，该动作依赖build-js
-gulp.task('md5:js', ['build-js'], function() {
+//将js加上10位md5,并修改html中的引用路径，该动作依赖 webpack
+gulp.task('md5:js', ['webpack'], function() {
     return gulp.src('dist/js/*.js')
         .pipe(md5(10, 'dist/app/*.html'))
         .pipe(gulp.dest('dist/js'))
@@ -86,6 +79,19 @@ gulp.task('sprite', ['copy:images', 'lessmin'], function() {
         .pipe(gulp.dest('dist/css'));
 });
 
+// jshint
+gulp.task('jshint', function() {
+    return gulp.src('./src/js/**/*.js')
+        .pipe(reload({
+            stream: true,
+            once: true
+        }))
+        .pipe($.jshint())
+        .pipe($.jshint.reporter('jshint-stylish'))
+        .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+});
+
+
 // 构建前删除 DIST 目录
 gulp.task('clean', function() {
     return del('./dist/').then(function() {
@@ -95,19 +101,21 @@ gulp.task('clean', function() {
 
 
 
-var myDevConfig = Object.create(webpackConfig);
-var devCompiler = webpack(myDevConfig);
-
-//引用webpack对js进行操作
-gulp.task("build-js", ['html'], function(callback) {
-    devCompiler.run(function(err, stats) {
-        if (err) throw new gutil.PluginError("webpack:build-js", err);
-        gutil.log("[webpack:build-js]", stats.toString({
-            colors: true
-        }));
-        callback();
-    });
+gulp.task("webpack", ['html'], function(callback) {
+    var myConfig = Object.create(webpackConfig);
+    // run webpack
+    webpack(
+        // configuration
+        myConfig,
+        function(err, stats) {
+            // if(err) throw new gutil.PluginError("webpack", err);
+            // gutil.log("[webpack]", stats.toString({
+            //     colors: true
+            // }));
+            callback();
+        });
 });
+
 
 
 // 添加本地服务，浏览器自动刷新，文件监听
@@ -126,9 +134,10 @@ gulp.task('serve', function() {
 
     gulp.watch('./src/css/**/*', ['lessmin']);
     gulp.watch('./src/app/**/*', ['html']);
-    // gulp.watch('./src/js/**/*', ['build-js']);
+    gulp.watch('./src/js/**/*', ['webpack']);
     gulp.watch('./src/images/**/*', ['copy:images']);
     gulp.watch('./dist/app/**/*.html').on("change", browserSync.reload);
+    gulp.watch('./dist/js/**/*.js').on("change", browserSync.reload);
 
 });
 
@@ -137,4 +146,4 @@ gulp.task('serve', function() {
 gulp.task('default', sequence('clean', ['html', 'md5:css', 'md5:js']));
 
 // 开发
-gulp.task('dev', sequence('clean', ['copy:images', 'html', 'lessmin', 'build-js'], 'serve'));
+gulp.task('dev', sequence('clean', ['copy:images', 'html', 'lessmin', 'webpack'], 'serve'));
