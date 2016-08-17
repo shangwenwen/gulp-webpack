@@ -1,7 +1,10 @@
 (function ($) {
-    const shade = "#556b2f";
+    var shade = "red";
     $.fn.greenify = function() {
-        this.css( 'color', 'red');
+        this.css( 'color', shade);
+        this.list = function(){
+        	console.log('list');
+        }
         return this;
     };
 }(jQuery));
