@@ -136,7 +136,6 @@ gulp.task('serve', function() {
     gulp.watch('./src/app/**/*', ['html']);
     gulp.watch('./src/js/**/*', ['webpack']);
     gulp.watch('./src/images/**/*', ['copy:images']);
-    gulp.watch('./dist/app/**/*.html').on("change", browserSync.reload);
     gulp.watch('./dist/js/**/*.js').on("change", browserSync.reload);
 
 });
