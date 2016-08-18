@@ -4,14 +4,10 @@ var fs = require('fs');
 var webpack = require('webpack');
 var uglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 
-
-
 var srcDir = path.resolve(process.cwd(), 'src');
 
-/**
- * [getEntry 获取多页面的每个入口文件，用于配置中的entry]
- * @return {[type]} [description]
- */
+
+// getEntry 获取多页面的每个入口文件，用于配置中的 entry
 function getEntry() {
     var jsPath = path.resolve(srcDir, 'js');
     var dirs = fs.readdirSync(jsPath);
@@ -43,6 +39,12 @@ module.exports = {
         chunkFilename: "[chunkhash].js"
     },
 
+    module: {
+        loaders: [
+            { test: require.resolve("tether"), loader: "expose?$!expose?Tether" }
+        ]
+    },
+
     resolve: {
         alias: {
             jquery: srcDir + "/js/lib/jquery.min.js",
@@ -52,6 +54,11 @@ module.exports = {
     },
 
     plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            "window.jQuery": "jquery"
+        }),
         new CommonsChunkPlugin('common.js'),
         new uglifyJsPlugin({
             compress: {
