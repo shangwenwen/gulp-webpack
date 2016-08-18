@@ -1,9 +1,8 @@
 'use strict';
 
 var gulp = require('gulp');
-var os = require('os');
 var gutil = require('gulp-util');
-var less = require('gulp-less');
+var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 var gulpOpen = require('gulp-open');
 var uglify = require('gulp-uglify');
@@ -28,9 +27,9 @@ gulp.task('copy:images', function() {
 });
 
 //压缩合并css, css中既有自己写的.less, 也有引入第三方库的.css
-gulp.task('lessmin', function() {
-    return gulp.src(['src/css/main.less', 'src/css/*.css'])
-        .pipe(less())
+gulp.task('sass', function() {
+    return gulp.src(['./src/css/main.scss', 'src/css/*.css'])
+        .pipe(sass.sync().on('error', sass.logError))
         .pipe(concat('style.min.css'))
         .pipe(cssmin())
         .pipe(gulp.dest('dist/css/'))
@@ -64,7 +63,7 @@ gulp.task('html', function() {
 });
 
 //雪碧图操作，应该先拷贝图片并压缩合并css
-gulp.task('sprite', ['copy:images', 'lessmin'], function() {
+gulp.task('sprite', ['copy:images', 'sass'], function() {
     var timestamp = +new Date();
     return gulp.src('dist/css/style.min.css')
         .pipe(spriter({
@@ -108,10 +107,10 @@ gulp.task("webpack", ['html'], function(callback) {
         // configuration
         myConfig,
         function(err, stats) {
-            // if(err) throw new gutil.PluginError("webpack", err);
-            // gutil.log("[webpack]", stats.toString({
-            //     colors: true
-            // }));
+            if(err) throw new gutil.PluginError("webpack", err);
+            gutil.log("[webpack]", stats.toString({
+                colors: true
+            }));
             callback();
         });
 });
@@ -132,7 +131,7 @@ gulp.task('serve', function() {
         port: 3000
     });
 
-    gulp.watch('./src/css/**/*', ['lessmin']);
+    gulp.watch('./src/css/**/*', ['sass']);
     gulp.watch('./src/app/**/*', ['html']);
     gulp.watch('./src/js/**/*', ['webpack']);
     gulp.watch('./src/images/**/*', ['copy:images']);
@@ -145,4 +144,4 @@ gulp.task('serve', function() {
 gulp.task('default', sequence('clean', ['html', 'md5:css', 'md5:js']));
 
 // 开发
-gulp.task('dev', sequence('clean', ['copy:images', 'html', 'lessmin', 'webpack'], 'serve'));
+gulp.task('dev', sequence('clean', ['copy:images', 'html', 'sass', 'webpack'], 'serve'));

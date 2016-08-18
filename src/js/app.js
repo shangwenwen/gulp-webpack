@@ -1,18 +1,13 @@
 require("jquery");
 
+var tether = require("tether");
+require('./lib/bootstrap.min.js');
 require("./lib/icheck.js");
 
-require('./lib/plugin.js');
-
-var tether = require("tether");
-
-require('./lib/bootstrap.js');
-
+require('./ui/plugin.js');
 
 $(function(){
 
 	$('.plusgin').greenify();
-
-	console.log(tether);
 
 })
